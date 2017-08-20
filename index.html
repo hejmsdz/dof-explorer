@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>DoF Explorer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container">
+      <h1>
+        <img src="logo.svg" width="60" height="60" alt="logo" class="logo">
+        DoF <strong>Explorer</strong>
+      </h1>
+    </div>
+  </header>
+
+  <div class="container row">
+    <div class="col1">
+      <div class="box">
+        <h2>Circle of confusion</h2>
+
+        <div class="field">
+          <label for="sensor-size">Sensor size:</label>
+          <select id="sensor-size">
+            <option value="1">full frame</option>
+            <option value="1.5">APS-C</option>
+            <option value="2">Four Thirds</option>
+            <option value="2.7">1 inch</option>
+            <option value="">custom</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Plotting</h2>
+
+        <div class="field">
+          <label for="y-axis">Y axis:</label>
+          <select id="y-axis">
+            <option value="nf">near &amp; far limit</option>
+            <option value="t">total depth</option>
+            <option value="h">hyperfocal</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="x-axis">X axis:</label>
+          <select id="x-axis">
+            <option value="a">aperture</option>
+            <option value="f">focal length</option>
+            <option value="s">subject distance</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Parameters</h2>
+
+        <div class="field">
+          <label for="focal">Focal length:</label>
+          <span class="value">50 mm</span>
+          <input id="focal" type="range" class="slider">
+        </div>
+
+        <div class="field">
+          <label for="subject">Subj. distance:</label>
+          <span class="value">130 cm</span>
+          <input id="subject" type="range" class="slider">
+        </div>
+
+        <button class="btn">Keep</button>
+      </div>
+    </div>
+
+    <div class="col2">
+      <div class="box">
+        <div style="height:450px"></div>
+      </div>
+
+      <div class="box">
+        <span class="legend-item">f=50 mm, s=130 cm</span>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    &copy; 2017 by <a href="https://mrozwadowski.com/">MR</a>
+  </footer>
+
+  <script src="https://unpkg.com/vue"></script>
+  <script src="scripts.js"></script>
+</body>
+</html>

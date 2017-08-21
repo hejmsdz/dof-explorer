@@ -11,19 +11,48 @@ function limits(focal, subject, hyperfocal) {
   ];
 }
 
-function circleOfConfusion(crop) {
-  const ffDiag = 43.2;
+function circleOfConfusion(diagonal) {
   const divisor = 1500;
-  return ffDiag / (crop * divisor);
+  return diagonal / divisor;
+}
+
+function Multivariable(focal, aperture, subject, coc) {
+  this.focal = focal;
+  this.aperture = aperture;
+  this.subject = subject;
+  this.coc = coc;
+
+  this.hyperfocal = function() {
+    return hyperfocal(mm(this.focal), this.aperture, mm(this.coc));
+  };
+
+  this.limits = function() {
+    return limits(mm(this.focal), cm(this.subject), this.hyperfocal());
+  };
+
+  this.total = function() {
+    let lims = this.limits();
+    return lims[1] - lims[0];
+  }
+
+  this.setAndGet = function(input, output) {
+    let that = this;
+    return function(val) {
+      let copy = Object.create(that);
+      copy[input] = val;
+      return copy[output]();
+    }
+  };
 }
 
 const sensorSizes = [
-  {symbol: 'full frame', crop: 1},
-  {symbol: 'APS-C', crop: 1.53},
-  {symbol: 'Four Thirds', crop: 2},
-  {symbol: '1 inch', crop: 2.72},
-  {symbol: '1/2.3 inch', crop: 5.64},
-  {symbol: '1/3 inch', crop: 7.21},
+  {symbol: 'full frame', crop: 1, diagonal: 43.2},
+  {symbol: 'APS-C', crop: 1.53, diagonal: 28.3},
+  {symbol: 'Canon APS-C', crop: 1.61, diagonal: 26.82},
+  {symbol: 'Four Thirds', crop: 2, diagonal: 22.5},
+  {symbol: '1 inch', crop: 2.72, diagonal: 15.86},
+  {symbol: '1/2.3 inch', crop: 5.64, diagonal: 7.66},
+  {symbol: '1/3 inch', crop: 7.21, diagonal: 6},
 ];
 
 const fStops = [
@@ -31,25 +60,146 @@ const fStops = [
   5, 5.6, 6.3, 7.1, 8, 9, 10, 11, 13, 14, 16, 18, 20, 22, 25, 29, 32
 ];
 
+function range(low, high, step = 1) {
+  return Array.from(Array((high - low) / step).keys())
+    .map(x => x * step)
+    .map(x => x + low);
+}
+
+function cm(x) {
+  return x / 100;
+}
+
+function mm(x) {
+  return x / 1000;
+}
+
+function roundSignificant(number, digits = 3) {
+  let allDigits = Math.floor(Math.log10(number)) + 1;
+  let factor = Math.pow(10, digits - allDigits);
+  return Math.round(factor * number) / factor;
+}
+
+function formatLength(meters) {
+  let rounded, unit = 'm';
+  if (meters > 1000) {
+    rounded = Math.round(meters);
+    unit = 'km';
+  } else if (meters > 1) {
+    rounded = roundSignificant(meters);
+  } else {
+    unit = 'cm';
+    rounded = Math.round(meters * 100);
+  }
+
+  return [rounded.toString().substr(0, 4), unit].join(' ');
+}
+
 const app = new Vue({
   el: '#app',
   data: {
     sensorSizes: sensorSizes,
     fStops: fStops,
     // defaults
-    crop: 1,
-    yPlot: 'nf',
-    xPlot: 'a',
+    sensorIndex: 0,
+    yPlot: 'total',
+    xPlot: 'aperture',
     fStop: 6,
     focalEquiv: 50,
     subject: 200,
   },
   computed: {
+    sensor: function() {
+      return sensorSizes[this.sensorIndex];
+    },
     focal: function() {
-      return Math.round(this.focalEquiv / this.crop);
+      return Math.round(this.focalEquiv / this.sensor.crop);
     },
     aperture: function() {
       return fStops[this.fStop];
     },
+  },
+  methods: {
+    plot: function() {
+      let plotConfig = plot(this.xPlot, this.yPlot, {
+        crop: this.sensor.crop,
+        focal: this.focal,
+        aperture: this.aperture,
+        subject: this.subject,
+        coc: circleOfConfusion(this.sensor.diagonal),
+      });
+      console.log(plotConfig);
+
+      let plotDiv = document.getElementById('plot');
+      Plotly.purge(plotDiv);
+      Plotly.plot(plotDiv, plotConfig.traces, plotConfig.options,
+        {
+          displayModeBar: false,
+          scrollZoom: false
+        }
+      );
+    }
   }
 });
+
+function plot(x, y, params) {
+  const xAxes = {
+    aperture: {
+      type: 'log',
+      title: 'aperture',
+      tickvals: fStops.filter((val, i) => i % 3 == 0),
+      fixedrange: true
+    },
+    focal: {
+      title: 'focal length [mm]',
+      fixedrange: true
+    },
+    subject: {
+      title: 'subject distance [cm]',
+      fixedrange: true
+    },
+  };
+
+  const xValues = {
+    aperture: fStops,
+    focal: range(10, 100).concat(range(100, 200, 2)).concat(range(200, 300, 5)).concat(300)
+      .map(f => f / params.crop),
+    subject: range(10, 100).concat(range(100, 1000, 10)).concat(1000),
+  }
+
+  const yAxes = {
+    hyperfocal: {
+      title: 'hyperfocal distance [m]',
+      fixedrange: true
+    },
+    total: {
+      title: 'total depth of field [m]',
+      fixedrange: true
+    }
+  };
+
+  let func = new Multivariable(
+    params.focal, params.aperture, params.subject, params.coc
+  ).setAndGet(x, y);
+
+  let xSeries = xValues[x];
+  let ySeries = xSeries.map(func);
+  let labels = ySeries.map(formatLength);
+
+  return {
+    traces: [
+      {
+        x: xSeries,
+        y: ySeries,
+        text: labels,
+        line: {shape: 'spline'},
+        hoverinfo: 'x+text'
+      }
+    ],
+    options: {
+      margin: { t: 10, b: 35, l: 35, r: 10 },
+      xaxis: xAxes[x],
+      yaxis: yAxes[y],
+    }
+  };
+}

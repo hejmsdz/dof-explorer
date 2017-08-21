@@ -21,8 +21,8 @@
 
         <div class="field">
           <label for="sensor-size">Sensor size:</label>
-          <select id="sensor-size" v-model="crop">
-            <option v-for="sensor in sensorSizes" v-bind:value="sensor.crop">{{sensor.symbol}}</option>
+          <select id="sensor-size" v-model="sensorIndex">
+            <option v-for="(eachSensor, i) in sensorSizes" v-bind:value="i">{{eachSensor.symbol}}</option>
           </select>
         </div>
       </div>
@@ -33,18 +33,18 @@
         <div class="field">
           <label for="y-axis">Y axis:</label>
           <select id="y-axis" v-model="yPlot">
-            <option value="nf">near &amp; far limit</option>
-            <option value="t">total depth</option>
-            <option value="h">hyperfocal</option>
+            <!--<option value="nf">near &amp; far limit</option>-->
+            <option value="total">total depth</option>
+            <option value="hyperfocal">hyperfocal</option>
           </select>
         </div>
 
         <div class="field">
           <label for="x-axis">X axis:</label>
           <select id="x-axis" v-model="xPlot">
-            <option value="a">aperture</option>
-            <option value="f">focal length</option>
-            <option value="s" v-bind:disabled="yPlot == 'h'">subject distance</option>
+            <option value="aperture">aperture</option>
+            <option value="focal">focal length</option>
+            <option value="subject" v-bind:disabled="yPlot == 'hyperfocal'">subject distance</option>
           </select>
         </div>
       </div>
@@ -52,36 +52,36 @@
       <div class="box">
         <h2>Parameters</h2>
 
-        <div class="field" v-if="xPlot != 'a'">
+        <div class="field" v-if="xPlot != 'aperture'">
           <label for="aperture">Aperture:</label>
           <span class="value">f/{{ aperture }}</span>
           <input id="focal" type="range" class="slider" v-model="fStop" min="0" v-bind:max="fStops.length - 1">
         </div>
 
-        <div class="field" v-if="xPlot != 'f'">
+        <div class="field" v-if="xPlot != 'focal'">
           <label for="focal">Focal length:</label>
           <span class="value">{{ focal }} mm</span>
           <input id="focal" type="range" class="slider" v-model="focalEquiv" min="10" max="300">
         </div>
 
-        <div class="field" v-if="xPlot != 's' &amp;&amp; yPlot != 'h'">
+        <div class="field" v-if="xPlot != 'subject' &amp;&amp; yPlot != 'hyperfocal'">
           <label for="subject">Subj. distance:</label>
           <span class="value">{{ subject }} cm</span>
           <input id="subject" type="range" class="slider" v-model="subject" min="10" max="1000">
         </div>
 
-        <button class="btn">Keep</button>
+        <button class="btn" v-on:click="plot">Plot</button>
       </div>
     </div>
 
     <div class="col2">
       <div class="box">
-        <div style="height:450px"></div>
+        <div id="plot"></div>
       </div>
 
-      <div class="box">
+      <!--<div class="box">
         <span class="legend-item">current settings</span>
-      </div>
+      </div>-->
     </div>
   </div>
 
@@ -90,6 +90,7 @@
   </footer>
 
   <script src="https://unpkg.com/vue"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script src="scripts.js"></script>
 </body>
 </html>

@@ -122,8 +122,30 @@ const app = new Vue({
       return fStops[this.fStop];
     },
   },
+  watch: {
+    sensorIndex: function() {
+      this.plot();
+    },
+    yPlot: function() {
+      this.plot();
+    },
+    xPlot: function() {
+      this.plot();
+    },
+    fStop: function() {
+      this.plot();
+    },
+    focalEquiv: function() {
+      this.plot();
+    },
+    subject: function() {
+      this.plot();
+    }
+  },
   methods: {
     plot: function() {
+      const plotDiv = document.getElementById('plot')
+
       let plotConfig = plot(this.xPlot, this.yPlot, {
         crop: this.sensor.crop,
         focal: this.focal,
@@ -132,7 +154,6 @@ const app = new Vue({
         coc: circleOfConfusion(this.sensor.diagonal),
       });
 
-      let plotDiv = document.getElementById('plot');
       Plotly.purge(plotDiv);
       Plotly.plot(plotDiv, plotConfig.traces, plotConfig.options,
         {
@@ -140,9 +161,14 @@ const app = new Vue({
           scrollZoom: false
         }
       );
+    },
+    keep: function() {
+      //
     }
   }
 });
+
+app.plot(); // initial
 
 function plot(x, y, params) {
   const xAxes = {

@@ -191,7 +191,7 @@ function plot(x, y, params) {
   let yAxis = yAxes[y];
 
   if ('range' in yAxis) {
-    yAxis.range[1] = Math.min(Math.max.apply(ySeries), yAxis.range[1]);
+    yAxis.range[1] = Math.min(Math.max.apply(null, ySeries.filter(x=>!isNaN(x))), yAxis.range[1]);
   }
 
   return {

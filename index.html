@@ -14,19 +14,15 @@
     </div>
   </header>
 
-  <div class="container row">
+  <div id="app" class="container row">
     <div class="col1">
       <div class="box">
         <h2>Circle of confusion</h2>
 
         <div class="field">
           <label for="sensor-size">Sensor size:</label>
-          <select id="sensor-size">
-            <option value="1">full frame</option>
-            <option value="1.5">APS-C</option>
-            <option value="2">Four Thirds</option>
-            <option value="2.7">1 inch</option>
-            <option value="">custom</option>
+          <select id="sensor-size" v-model="crop">
+            <option v-for="sensor in sensorSizes" v-bind:value="sensor.crop">{{sensor.symbol}}</option>
           </select>
         </div>
       </div>
@@ -36,7 +32,7 @@
 
         <div class="field">
           <label for="y-axis">Y axis:</label>
-          <select id="y-axis">
+          <select id="y-axis" v-model="yPlot">
             <option value="nf">near &amp; far limit</option>
             <option value="t">total depth</option>
             <option value="h">hyperfocal</option>
@@ -45,10 +41,10 @@
 
         <div class="field">
           <label for="x-axis">X axis:</label>
-          <select id="x-axis">
+          <select id="x-axis" v-model="xPlot">
             <option value="a">aperture</option>
             <option value="f">focal length</option>
-            <option value="s">subject distance</option>
+            <option value="s" v-bind:disabled="yPlot == 'h'">subject distance</option>
           </select>
         </div>
       </div>
@@ -56,16 +52,22 @@
       <div class="box">
         <h2>Parameters</h2>
 
-        <div class="field">
-          <label for="focal">Focal length:</label>
-          <span class="value">50 mm</span>
-          <input id="focal" type="range" class="slider">
+        <div class="field" v-if="xPlot != 'a'">
+          <label for="aperture">Aperture:</label>
+          <span class="value">f/{{ aperture }}</span>
+          <input id="focal" type="range" class="slider" v-model="fStop" min="0" v-bind:max="fStops.length - 1">
         </div>
 
-        <div class="field">
+        <div class="field" v-if="xPlot != 'f'">
+          <label for="focal">Focal length:</label>
+          <span class="value">{{ focal }} mm</span>
+          <input id="focal" type="range" class="slider" v-model="focalEquiv" min="10" max="300">
+        </div>
+
+        <div class="field" v-if="xPlot != 's' &amp;&amp; yPlot != 'h'">
           <label for="subject">Subj. distance:</label>
-          <span class="value">130 cm</span>
-          <input id="subject" type="range" class="slider">
+          <span class="value">{{ subject }} cm</span>
+          <input id="subject" type="range" class="slider" v-model="subject" min="10" max="1000">
         </div>
 
         <button class="btn">Keep</button>
@@ -78,7 +80,7 @@
       </div>
 
       <div class="box">
-        <span class="legend-item">f=50 mm, s=130 cm</span>
+        <span class="legend-item">current settings</span>
       </div>
     </div>
   </div>

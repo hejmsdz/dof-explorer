@@ -29,21 +29,30 @@ h1 {
   background-size: 64px;
 }
 
-.row {
-  display: flex;
-}
-
 .col1 {
-  width: 300px;
-  margin-right: 20px;
+  display: flex;
+  justify-content: space-between;
 }
 
-.col2 {
-  width: 620px;
-  margin-right: 20px;
+@media screen and (min-width: 940px) {
+  .row {
+    display: flex;
+  }
+
+  .col1 {
+    width: 300px;
+    margin-right: 20px;
+    display: block;
+  }
+
+  .col2 {
+    width: 100%;
+    max-width: 640px;
+  }
 }
 
 .box {
+  box-sizing: border-box;
   background: #fff;
   padding: 1em;
   margin-bottom: 20px;
@@ -112,6 +121,10 @@ select {
   color: #fff;
   padding: 8px 20px;
   border-radius: 4px;
+}
+
+#plot {
+  width: 100%;
 }
 
 .legend-item {

@@ -23,10 +23,9 @@ h1 {
   font-weight: 400;
   font-size: 36px;
   display: inline;
-}
-
-.logo {
-  margin-bottom: -16px;
+  padding: 5px 0 5px 72px;
+  background: url('logo.svg') no-repeat 0 -2px;
+  background-size: 64px;
 }
 
 .row {

@@ -128,7 +128,6 @@ const app = new Vue({
         subject: this.subject,
         coc: circleOfConfusion(this.sensor.diagonal),
       });
-      console.log(plotConfig);
 
       let plotDiv = document.getElementById('plot');
       Plotly.purge(plotDiv);
@@ -162,8 +161,7 @@ function plot(x, y, params) {
 
   const xValues = {
     aperture: fStops,
-    focal: range(10, 100).concat(range(100, 200, 2)).concat(range(200, 300, 5)).concat(300)
-      .map(f => f / params.crop),
+    focal: range(24, 100).map(f => f / params.crop),
     subject: range(10, 100).concat(range(100, 1000, 10)).concat(1000),
   }
 

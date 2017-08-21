@@ -16,6 +16,7 @@ body {
   color: #fff;
   padding: 1em;
   margin-bottom: 36px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
 
 h1 {
@@ -46,6 +47,8 @@ h1 {
   background: #fff;
   padding: 1em;
   margin-bottom: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
 }
 
 h2 {
@@ -98,6 +101,7 @@ select {
   color: #464646;
   padding: 3px 5px;
   width: 9.5em;
+  border-radius: 4px;
 }
 
 .btn {
@@ -107,6 +111,7 @@ select {
   background: #4b85f9;
   color: #fff;
   padding: 8px 20px;
+  border-radius: 4px;
 }
 
 .legend-item {

@@ -231,9 +231,10 @@ function plot(x, y, params) {
       }
     ],
     options: {
-      margin: { t: 10, b: 35, l: 35, r: 10 },
+      margin: { t: 20, b: 35, l: 35, r: 20 },
       xaxis: xAxis,
       yaxis: yAxis,
+      font: { family: 'Lato' }
     }
   };
 }

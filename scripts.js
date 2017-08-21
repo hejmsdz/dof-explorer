@@ -32,6 +32,9 @@ function Multivariable(focal, aperture, subject, coc) {
 
   this.total = function() {
     let lims = this.limits();
+    if (lims[0] > lims[1]) {
+      return undefined;
+    }
     return lims[1] - lims[0];
   }
 
@@ -172,6 +175,7 @@ function plot(x, y, params) {
     },
     total: {
       title: 'total depth of field [m]',
+      range: [0, 100],
       fixedrange: true
     }
   };
@@ -183,6 +187,12 @@ function plot(x, y, params) {
   let xSeries = xValues[x];
   let ySeries = xSeries.map(func);
   let labels = ySeries.map(formatLength);
+  let xAxis = xAxes[x];
+  let yAxis = yAxes[y];
+
+  if ('range' in yAxis) {
+    yAxis.range[1] = Math.min(Math.max.apply(ySeries), yAxis.range[1]);
+  }
 
   return {
     traces: [
@@ -196,8 +206,8 @@ function plot(x, y, params) {
     ],
     options: {
       margin: { t: 10, b: 35, l: 35, r: 10 },
-      xaxis: xAxes[x],
-      yaxis: yAxes[y],
+      xaxis: xAxis,
+      yaxis: yAxis,
     }
   };
 }

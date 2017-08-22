@@ -38,7 +38,7 @@
     };
 
     this.limits = function() {
-      return limits(mm(this.focal), cm(this.subject), this.hyperfocal());
+      return limits(mm(this.focal), this.subject, this.hyperfocal());
     };
 
     this.total = function() {
@@ -64,6 +64,10 @@
       .map(x => x * step + low);
   }
 
+  function rangeIncl(low, high, step = 1) {
+    return range(low, high, step).concat(high);
+  }
+
   function roundSignificant(number, digits = 3) {
     let allDigits = Math.floor(Math.log10(number)) + 1;
     let factor = Math.pow(10, digits - allDigits);
@@ -72,10 +76,10 @@
 
   function formatLength(meters) {
     let rounded, unit = 'm';
-    if (meters > 1000) {
+    if (meters >= 1000) {
       rounded = Math.round(meters);
       unit = 'km';
-    } else if (meters > 1) {
+    } else if (meters >= 1) {
       rounded = roundSignificant(meters);
     } else {
       unit = 'cm';
@@ -98,16 +102,10 @@
         fixedrange: true
       },
       subject: {
-        title: 'subject distance [cm]',
+        title: 'subject distance [m]',
         fixedrange: true
       },
     };
-
-    const xValues = {
-      aperture: fStops,
-      focal: range(24, 100).map(f => f / params.crop),
-      subject: range(10, 100).concat(range(100, 1000, 10)).concat(1000),
-    }
 
     const yAxes = {
       hyperfocal: {
@@ -125,7 +123,42 @@
       params.focal, params.aperture, params.subject, params.coc
     ).setAndGet(x, y);
 
-    let xSeries = xValues[x];
+    let xSeries;
+    switch (x) {
+      case 'aperture':
+        xSeries = fStops;
+        break;
+      case 'focal':
+        switch (params.focalRange) {
+          case 'wide':
+            xSeries = rangeIncl(10, 28);
+            break;
+          case 'normal':
+            xSeries = rangeIncl(24, 100);
+            break;
+          case 'tele':
+            xSeries = rangeIncl(80, 300);
+            break;
+        }
+        break;
+      case 'subject':
+        switch (params.subjectRange) {
+          case 'near':
+            xSeries = rangeIncl(0.1, 1, 0.1);
+            break;
+          case 'normal':
+            xSeries = rangeIncl(1, 5, 0.05);
+            break;
+          case 'far':
+            xSeries = rangeIncl(5, 10, 0.1);
+            break;
+          case 'super-far':
+            xSeries = rangeIncl(10, 100);
+            break;
+        }
+        break;
+    }
+
     let ySeries = xSeries.map(func);
     let labels = ySeries.map(formatLength);
     let xAxis = xAxes[x];
@@ -180,13 +213,18 @@
       sensorIndex: 0,
       yPlot: 'total',
       xPlot: 'aperture',
+      xFocalRange: 'normal',
+      xSubjectRange: 'normal',
       fStop: 6,
-      focalEquiv: 50,
-      subject: 200,
+      logFocalEquiv: 1.7,
+      logSubject: 0.3,
     },
     computed: {
       sensor: function() {
         return sensorSizes[this.sensorIndex];
+      },
+      focalEquiv: function() {
+        return Math.min(Math.round(Math.pow(10, this.logFocalEquiv)), 300);
       },
       focal: function() {
         return Math.round(this.focalEquiv / this.sensor.crop);
@@ -194,15 +232,27 @@
       aperture: function() {
         return fStops[this.fStop];
       },
+      subject: function() {
+        return Math.round(100 * Math.pow(10, this.logSubject)) / 100;
+      }
     },
     watch: {
       sensorIndex: function() {
         this.plot();
       },
-      yPlot: function() {
+      yPlot: function(value) {
+        if (value == 'hyperfocal' && this.xPlot == 'subject') {
+          this.xPlot = 'aperture';
+        }
         this.plot();
       },
       xPlot: function() {
+        this.plot();
+      },
+      xFocalRange: function() {
+        this.plot();
+      },
+      xSubjectRange: function() {
         this.plot();
       },
       fStop: function() {
@@ -216,6 +266,7 @@
       }
     },
     methods: {
+      formatLength: formatLength,
       plot: function() {
         const plotDiv = document.getElementById('plot')
 
@@ -225,6 +276,8 @@
           aperture: this.aperture,
           subject: this.subject,
           coc: circleOfConfusion(this.sensor.diagonal),
+          focalRange: this.xFocalRange,
+          subjectRange: this.xSubjectRange,
         });
 
         Plotly.purge(plotDiv);

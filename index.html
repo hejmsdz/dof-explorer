@@ -43,8 +43,8 @@
           <label for="x-axis">X axis:</label>
           <select id="x-axis" v-model="xPlot">
             <option value="aperture">aperture</option>
-            <option value="focal">focal length</option>
             <option value="subject" v-bind:disabled="yPlot == 'hyperfocal'">subj. distance</option>
+            <option value="focal">focal length</option>
           </select>
         </div>
 
@@ -61,9 +61,9 @@
           <label for="subject-range">Distance range:</label>
           <select id="subject-range" v-model="xSubjectRange">
             <option value="near">&lt; 1 m</option>
-            <option value="normal">1 m – 5 m</option>
-            <option value="far">5 m – 10 m</option>
-            <option value="super-far">10 m – 100 m</option>
+            <option value="normal">1 m &ndash; 5 m</option>
+            <option value="far">5 m &ndash; 10 m</option>
+            <option value="super-far">10 m &ndash; 100 m</option>
           </select>
         </div>
       </div>
@@ -91,8 +91,6 @@
           <span class="value" v-html="formatLength(subject)"></span>
           <input id="subject" type="range" class="slider" v-model="logSubject" min="-1" max="2" step="0.01">
         </div>
-
-        <button class="btn" v-on:click="keep()">Keep</button>
       </div>
     </div>
 
@@ -100,10 +98,6 @@
       <div class="box" id="plot-box">
         <div id="plot"></div>
       </div>
-
-      <!--<div class="box">
-        <span class="legend-item">current settings</span>
-      </div>-->
     </div>
   </div>
 

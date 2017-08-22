@@ -7,9 +7,10 @@
   function limits(focal, subject, hyperfocal) {
     let hs = hyperfocal * subject;
     let sf = subject - focal;
+    let inf = hyperfocal < (subject - focal);
     return [
       hs / (hyperfocal + sf),
-      hs / (hyperfocal - sf)
+      inf ? Infinity : hs / (hyperfocal - sf)
     ];
   }
 
@@ -108,6 +109,11 @@
     };
 
     const yAxes = {
+      limits: {
+        title: 'distance [m]',
+        range: [0, 300],
+        fixedrange: true
+      },
       hyperfocal: {
         title: 'hyperfocal distance [m]',
         fixedrange: true
@@ -160,30 +166,46 @@
     }
 
     let ySeries = xSeries.map(func);
-    let labels = ySeries.map(formatLength);
     let xAxis = xAxes[x];
     let yAxis = yAxes[y];
 
-    if ('range' in yAxis) {
-      yAxis.range[1] = Math.min(Math.max.apply(null, ySeries.filter(x=>!isNaN(x))), yAxis.range[1]);
+    let traces = [
+      {
+        x: xSeries,
+        y: ySeries,
+        line: {shape: 'spline'},
+        hoverinfo: 'x+text',
+        mode: 'lines'
+      }
+    ];
+
+    if (y == 'limits') {
+      let near = traces[0].y.map(x => x[0]);
+      let far = traces[0].y.map(x => x[1]);
+      traces[0].y = near;
+      traces[0].fill = 'none';
+      traces.push(Object.create(traces[0]))
+      traces[1].y = far;
+      traces[1].fill = 'tonexty';
     }
 
+    if ('range' in yAxis) {
+      yAxis.range[1] = Math.min(
+        Math.max.apply(null, traces[traces.length - 1].y.filter(x => isFinite(x))),
+        yAxis.range[1]
+      );
+    }
+
+    traces.forEach(trace => trace.text = trace.y.map(formatLength));
+
     return {
-      traces: [
-        {
-          x: xSeries,
-          y: ySeries,
-          text: labels,
-          line: {shape: 'spline'},
-          hoverinfo: 'x+text',
-          mode: 'lines'
-        }
-      ],
+      traces: traces,
       options: {
         margin: { t: 20, b: 35, l: 45, r: 20 },
         xaxis: xAxis,
         yaxis: yAxis,
-        font: { family: 'Lato' }
+        font: { family: 'Lato' },
+        showlegend: false
       }
     };
   }

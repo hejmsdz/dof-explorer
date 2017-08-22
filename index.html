@@ -81,7 +81,7 @@
           <label for="focal">Focal length:</label>
           <span class="value">
             {{ focal }}&nbsp;mm
-            <small v-if="sensorIndex > 0">(<abbr title="35 mm equivalent">eq.</abbr> {{ focalEquiv }}&nbsp;mm)</small>
+            <small title="35 mm equivalent" v-if="sensorIndex > 0">&equiv;&nbsp;{{ focalEquiv }}&nbsp;mm</small>
           </span>
           <input id="focal" type="range" class="slider" v-model="logFocalEquiv" min="1" max="2.48" step="0.01">
         </div>

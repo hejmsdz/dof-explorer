@@ -86,7 +86,7 @@
       rounded = Math.round(meters * 100);
     }
 
-    return [rounded.toString().substr(0, 4), unit].join(' ');
+    return [rounded.toString().substr(0, 4), unit].join('&nbsp;');
   }
 
   function plot(x, y, params) {
@@ -297,4 +297,14 @@
 
   // on ready
   app.plot();
+
+  // auto resize
+  window.addEventListener('resize', function() {
+    Plotly.Plots.resize(
+      Plotly.d3
+        .select('#plot')
+        .style({ width: '100%', height: '100%' })
+        .node()
+    );
+  });
 })();

@@ -29,6 +29,14 @@ h1 {
   background-size: 64px;
 }
 
+#app {
+  transition: .5s opacity;
+}
+
+[v-cloak] {
+  opacity: 0;
+}
+
 .col1 {
   display: flex;
   justify-content: space-between;
@@ -64,7 +72,7 @@ h2 {
   font-size: 24px;
   font-weight: 400;
   color: #5d5d5d;
-  margin: .5em 0;
+  margin: .3em 0 .5em;
 }
 
 .field {
@@ -86,6 +94,8 @@ label {
   -webkit-appearance: none;
   margin-top: 15px;
   margin-bottom: 20px;
+  border: none;
+  outline: none;
 }
 
 .slider::-webkit-slider-thumb {
@@ -95,11 +105,17 @@ label {
   border: none;
   width: 10px;
   height: 25px;
+  border-radius: 4px;
 }
 
 .slider::-webkit-slider-runnable-track {
   height: 6px;
   background: #ebebeb;
+  border-radius: 4px;
+}
+
+.slider:focus::-webkit-slider-runnable-track {
+  background: #b9b9b9;
 }
 
 select {
@@ -111,6 +127,11 @@ select {
   padding: 3px 5px;
   width: 9.5em;
   border-radius: 4px;
+  outline: none;
+}
+
+select:focus {
+  border-color: #b9b9b9;
 }
 
 .btn {

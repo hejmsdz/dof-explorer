@@ -175,11 +175,12 @@
           y: ySeries,
           text: labels,
           line: {shape: 'spline'},
-          hoverinfo: 'x+text'
+          hoverinfo: 'x+text',
+          mode: 'lines'
         }
       ],
       options: {
-        margin: { t: 20, b: 35, l: 35, r: 20 },
+        margin: { t: 20, b: 35, l: 45, r: 20 },
         xaxis: xAxis,
         yaxis: yAxis,
         font: { family: 'Lato' }

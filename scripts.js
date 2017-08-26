@@ -225,6 +225,11 @@
     5, 5.6, 6.3, 7.1, 8, 9, 10, 11, 13, 14, 16, 18, 20, 22, 25, 29, 32
   ];
 
+  let defaultSensorIndex = 0;
+  if ('localStorage' in window) {
+    defaultSensorIndex = parseInt(localStorage.sensorIndex) || 0;
+  }
+
   // vue
   const app = new Vue({
     el: '#app',
@@ -232,7 +237,7 @@
       sensorSizes: sensorSizes,
       fStops: fStops,
       // defaults
-      sensorIndex: 0,
+      sensorIndex: defaultSensorIndex,
       yPlot: 'total',
       xPlot: 'aperture',
       xFocalRange: 'normal',
@@ -259,7 +264,11 @@
       }
     },
     watch: {
-      sensorIndex: function() {
+      sensorIndex: function(value) {
+        if ('localStorage' in window) {
+          localStorage.sensorIndex = value;
+        }
+
         this.plot();
       },
       yPlot: function(value) {

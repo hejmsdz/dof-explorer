@@ -132,17 +132,19 @@
         xSeries = fStops;
         break;
       case 'focal':
+        let focalRangeLims;
         switch (params.focalRange) {
           case 'wide':
-            xSeries = rangeIncl(10, 28);
+            focalRangeLims = [10, 28];
             break;
           case 'normal':
-            xSeries = rangeIncl(24, 100);
+            focalRangeLims = [24, 100];
             break;
           case 'tele':
-            xSeries = rangeIncl(80, 300);
+            focalRangeLims = [80, 300];
             break;
         }
+        xSeries = rangeIncl(...focalRangeLims.map(f => Math.round(f / params.crop)));
         break;
       case 'subject':
         switch (params.subjectRange) {
@@ -296,6 +298,7 @@
           aperture: this.aperture,
           subject: this.subject,
           coc: circleOfConfusion(this.sensor.diagonal),
+          crop: this.sensor.crop,
           focalRange: this.xFocalRange,
           subjectRange: this.xSubjectRange,
         });

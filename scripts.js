@@ -1,4 +1,5 @@
 (function() {
+  "use strict";
   // optical computation
   function hyperfocal(focal, aperture, coc) {
     return focal + Math.pow(focal, 2) / (aperture * coc);
@@ -20,10 +21,6 @@
   }
 
   // utilities
-  function cm(x) {
-    return x / 100;
-  }
-
   function mm(x) {
     return x / 1000;
   }
@@ -48,7 +45,7 @@
         return undefined;
       }
       return lims[1] - lims[0];
-    }
+    };
 
     this.setAndGet = function(input, output) {
       let that = this;
@@ -56,7 +53,7 @@
         let copy = Object.create(that);
         copy[input] = val;
         return copy[output]();
-      }
+      };
     };
   }
 
@@ -184,7 +181,7 @@
       let far = traces[0].y.map(x => x[1]);
       traces[0].y = near;
       traces[0].fill = 'none';
-      traces.push(Object.create(traces[0]))
+      traces.push(Object.create(traces[0]));
       traces[1].y = far;
       traces[1].fill = 'tonexty';
     }
@@ -291,7 +288,7 @@
     methods: {
       formatLength: formatLength,
       plot: function() {
-        const plotDiv = document.getElementById('plot')
+        const plotDiv = document.getElementById('plot');
 
         let plotConfig = plot(this.xPlot, this.yPlot, {
           crop: this.sensor.crop,
